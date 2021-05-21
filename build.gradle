@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+    id "org.sonarqube" version "3.0"
+    id 'jacoco'
+    id'com.github.johnrengelman.shadow'version'6.1.0'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation group: 'org.glassfish.jersey.bundles', name: 'jaxrs-ri', version: '2.+'
+    implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.+'
+
+    implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.+'
+
+    // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.+'
+    // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.+'
+
+    // Grizzly will host the service
+    implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-grizzly2-http', version: '2.+'
+
+    // Logging
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.+'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.+'
+
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.0'
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.22.Final'
+
+    implementation group: 'org.mindrot', name: 'jbcrypt', version: '0.3m'
+
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2',
+            // Uncomment the next line if you want to use RSASSA-PSS (PS256, PS384, PS512) algorithms:
+            //'org.bouncycastle:bcprov-jdk15on:1.60',
+            'io.jsonwebtoken:jjwt-jackson:0.11.2' // or 'io.jsonwebtoken:jjwt-gson:0.11.2' for gson
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+
+    testImplementation "org.mockito:mockito-core:2.+"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+shadowJar {
+
+    mergeServiceFiles()
+
+    manifest {
+        attributes 'Main-Class': 'gamefully.service.Publisher'
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+test.finalizedBy jacocoTestReport

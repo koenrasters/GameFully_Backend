@@ -1,0 +1,31 @@
+stages:
+  - build
+  - test
+  - sonarqube
+  - deployment
+
+build:
+  stage: build
+  script:
+    - ./gradlew build
+
+test:
+  stage: test
+  script:
+    - ./gradlew test
+
+sonarqube:
+  stage: sonarqube
+  script:
+    - ./gradlew test
+    - ./gradlew sonarqube
+
+deployment:
+  stage: deployment
+  before_script:
+    - docker info
+    - ./gradlew shadowJar
+  script:
+    - docker build -t gamefully-back .
+    - docker run --rm -dp 9090:9090 --name gamefully gamefully-back
+    - docker run --rm -dp 80:80 --name gamefully-front gamefully-front:prod
